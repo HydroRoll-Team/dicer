@@ -372,25 +372,22 @@ if initalized:
                 manager.process_generic_event("DebugOn", event=event)
             )
 
-        if args[0] == "on":
-            debugon()
-            logging.getLogger().setLevel(logging.DEBUG)
-            logger.remove()
-            logger.add(sys.stdout, level="INFO")
-            logger.info("输出等级设置为 DEBUG.")
-            return await matcher.send(
-                manager.process_generic_event("DebugOn", event=event)
-            )
-        else:
+        if args[0] != "on":
             return await matcher.send("错误, 我无法解析你的指令.")
+        debugon()
+        logging.getLogger().setLevel(logging.DEBUG)
+        logger.remove()
+        logger.add(sys.stdout, level="INFO")
+        logger.info("输出等级设置为 DEBUG.")
+        return await matcher.send(
+            manager.process_generic_event("DebugOn", event=event)
+        )
 
     @superusercommand.handle()
     async def superuser_handler(matcher: Matcher, event: Event):
         """超级用户管理指令"""
         args = format_str(event.get_message(), begin=(".su", ".sudo"))
-        arg = list(filter(None, args.split(" ")))
-
-        if len(arg) >= 1:
+        if arg := list(filter(None, args.split(" "))):
             if arg[0].lower() == "exit":
                 if not rm_super_user(event):
                     return await matcher.send(
@@ -411,16 +408,16 @@ if initalized:
             await matcher.send(
                 manager.process_generic_event("AuthenticateStarted", event=event)
             )
+        elif args == get_uuid():
+            add_super_user(event)
+            await matcher.send(
+                manager.process_generic_event("AuthenticateSuccess", event=event)
+            )
+
         else:
-            if not args == get_uuid():
-                await matcher.send(
-                    manager.process_generic_event("AuthenticateFailed", event=event)
-                )
-            else:
-                add_super_user(event)
-                await matcher.send(
-                    manager.process_generic_event("AuthenticateSuccess", event=event)
-                )
+            await matcher.send(
+                manager.process_generic_event("AuthenticateFailed", event=event)
+            )
 
     @botcommand.handle()
     async def bothandler(bot: Bot, matcher: Matcher, event: Event, args: list = []):
@@ -575,9 +572,7 @@ if initalized:
 
         if commands["store"]:
             official, community = await get_plugins()
-            reply = "从商店搜索到以下插件:\n"
-            reply += "Noctisynth 官方插件:\n"
-
+            reply = "从商店搜索到以下插件:\n" + "Noctisynth 官方插件:\n"
             i = 1
             for name, detail in official.items():
                 reply += f"  {i}. {detail['name']}[安装: .bot install {name}]\n"

@@ -112,7 +112,7 @@ class ReplyRegistry:
             self._add_data_in_file(filename, cache, response, True)
             return container.is_enable(event_name)
         except KeyError as e:
-            logger.error(f"请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
+            logger.error("请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
             logger.error(f"Error: {e}")
             return None
 
@@ -145,7 +145,7 @@ class ReplyRegistry:
             self._add_data_in_file(filename, cache, response, True)
             return container.is_enable(event_name)
         except KeyError as e:
-            logger.error(f"请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
+            logger.error("请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
             logger.error(f"Error: {e}")
             return None
 
@@ -178,7 +178,7 @@ class ReplyRegistry:
             self._add_data_in_file(filename, cache, response, True)
             return container.is_enable(event_name)
         except KeyError as e:
-            logger.error(f"请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
+            logger.error("请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
             logger.error(f"Error: {e}")
             return None
 
@@ -477,7 +477,7 @@ class ReplyRegistry:
                             const.REPLY_YAML.dump(data=data, stream=drf)
                             break
         except Exception as e:
-            logger.error(f"数据持久化异常")
+            logger.error("数据持久化异常")
             logger.error(f"Error: {e}")
             return False
 
@@ -516,7 +516,7 @@ class ReplyRegistry:
                             break
 
         except Exception as e:
-            logger.error(f"数据擦除异常")
+            logger.error("数据擦除异常")
             logger.error(f"Error: {e}")
             return False
 

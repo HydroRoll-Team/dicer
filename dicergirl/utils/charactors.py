@@ -29,8 +29,8 @@ class Character:
 
     def skills_output(self) -> str:
         if not self.skills:
-            return "%s 当前无任何技能数据。" % self.name
-        r = "%s技能数据: " % self.name
+            return f"{self.name} 当前无任何技能数据。"
+        r = f"{self.name}技能数据: "
         for k, v in self.skills.items():
             r += "\n%s: %d" % (k, v)
         return r

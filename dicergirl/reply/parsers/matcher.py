@@ -30,9 +30,6 @@ class TextMatcher:
             return self.__partial_matcher(send_text, *tmp)
         elif match_type == MatchType.REGEX_MATCH:
             return self.__regex_matcher(send_text, match_field)
-        elif match_type == MatchType.FUNCTION_MATCH:
-            # TODO
-            pass
 
     @staticmethod
     def __exact_matcher(first, second) -> bool:
@@ -46,10 +43,7 @@ class TextMatcher:
         """
         部分匹配器
         """
-        for arg in args:
-            if str(arg) in str(text):
-                return True
-        return False
+        return any(str(arg) in str(text) for arg in args)
 
     @staticmethod
     def __regex_matcher(text, regex) -> bool:

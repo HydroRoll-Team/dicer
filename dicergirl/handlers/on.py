@@ -40,7 +40,7 @@ class StartswithRule:
         try:
             text = translate_punctuation(event.get_plaintext()).strip()
             if text.startswith("/"):
-                text = "." + text[1:]  # 兼容QQ协议`/`的协议头
+                text = f".{text[1:]}"
         except Exception:
             return False
         if match := re.match(

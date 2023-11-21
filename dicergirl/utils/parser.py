@@ -163,7 +163,7 @@ class CommandParser:
         """开始拆析指令集合"""
         if not args:
             args = self.args
-        iter_args = [arg for arg in args]
+        iter_args = list(args)
 
         if not isinstance(args, (list, tuple)):
             raise TypeError("指令切片必须传入列或数组.")
@@ -201,18 +201,18 @@ class CommandParser:
                     nothing = False
                 else:
                     results[command.key[0]] = command.default
-            else:
-                if isinstance(command, Required):
-                    raise CommandRequired(
-                        f"Required parameter `{command.key[0]}` not found."
-                    )
+            elif isinstance(command, Required):
+                raise CommandRequired(
+                    f"Required parameter `{command.key[0]}` not found."
+                )
 
+            else:
                 results[command.key[0]] = command.default
 
         positional_commands = positional(self.commands)
         str_positionals = self.commands.get_plain_positional()
         for positional_command in positional_commands:
-            if len(iter_args) == 0:
+            if not iter_args:
                 break
 
             index = str_positionals.index(str(positional_command))

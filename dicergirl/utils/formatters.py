@@ -36,12 +36,12 @@ def translate_punctuation(string) -> str:
 def format_str(message: str, begin=None, lower=True) -> str:
     """骰娘指令转义及解析"""
     regex = r"[<\[](.*?)[\]>]"
-    message = str(message).lower() if lower else str(message)
+    message = message.lower() if lower else message
     msg = translate_punctuation(
         re.sub("\s+", " ", re.sub(regex, "", message)).strip(" ")
     )
     if msg.startswith("/"):
-        msg = "." + msg[1:]
+        msg = f".{msg[1:]}"
     logger.debug(msg)
 
     if begin:

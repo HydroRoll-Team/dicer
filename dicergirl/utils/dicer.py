@@ -69,16 +69,8 @@ class Dice(BaseDice):
         self.dices = []
         split = re.split(r"[dD]", self.roll_string)
 
-        if split[0]:
-            self.a = int(split[0])
-        else:
-            self.a = 1
-
-        if split[1]:
-            self.b = int(split[1])
-        else:
-            self.b = 100
-
+        self.a = int(split[0]) if split[0] else 1
+        self.b = int(split[1]) if split[1] else 100
         self.db = f"{self.a}D{self.b}"
         self.dices += [f"D{self.b}"] * self.a
         return self
@@ -131,11 +123,7 @@ class AwardDice(BaseDice):
     def parse(self) -> "AwardDice":
         split = re.split(r"[bB]", self.roll_string)
 
-        if split[0]:
-            self.a = int(split[0])
-        else:
-            self.a = 1
-
+        self.a = int(split[0]) if split[0] else 1
         self.b = int(split[1])
         self.db = f"{self.a}B{self.b}"
         return self
@@ -173,11 +161,7 @@ class PunishDice(BaseDice):
     def parse(self) -> "PunishDice":
         split = re.split(r"[pP]", self.roll_string)
 
-        if split[0]:
-            self.a = int(split[0])
-        else:
-            self.a = 1
-
+        self.a = int(split[0]) if split[0] else 1
         self.b = int(split[1])
         self.db = f"{self.a}P{self.b}"
         return self
@@ -341,7 +325,7 @@ if __name__ == "__main__":
         "10d1-10d1+10d1": 10,
         "10d1-10d1-10d1": -10,
     }
-    for roll_string in roll_strings.keys():
+    for roll_string in roll_strings:
         try:
             dice = Dicer().parse(roll_string).roll().roll()
             if dice.outcome != roll_strings[roll_string]:

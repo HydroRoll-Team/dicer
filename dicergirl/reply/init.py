@@ -31,7 +31,7 @@ def _load_template_methods():
     """
     获取 templates.py 中的所有方法
     """
-    for name, method in vars(templates).items():
+    for method in vars(templates).values():
         if callable(method):
             manager.register_method(method)
 
@@ -89,7 +89,7 @@ def _load_reply_file(filename, filepath, cache, container_class) -> bool:
                         )
             return manager.register_container(container)
     except KeyError as e:
-        logger.error(f"请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
+        logger.error("请确保您的回复配置文件包含了正确的键和相应的值。如果您不确定如何正确配置文件，请参考文档或向管理员寻求帮助。")
         logger.error(f"Error: {e}")
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -132,5 +132,5 @@ def init_yaml_file(filepath, yaml_template):
                 raw_data = const.REPLY_YAML.load(yaml_template)
                 const.REPLY_YAML.dump(data=raw_data, stream=drf)
     except Exception as e:
-        logger.error(f"初始化回复配置时出现异常。")
+        logger.error("初始化回复配置时出现异常。")
         logger.error(f"Error: {e}")

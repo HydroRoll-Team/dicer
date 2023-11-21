@@ -13,24 +13,21 @@ logger = multilogger(name="DicerGirl", payload="utils.handlers")
 
 def get_mentions(event: Event) -> List[str]:
     """获取`event`指向的消息所有被`@`的用户 QQ 号"""
-    mentions = []
     try:
         message = json.loads(event.json())["message"]
     except KeyError:
         return []
 
-    for mention in message:
-        if mention["type"] == "at":
-            mentions.append(mention["data"]["qq"])
-
-    return mentions
+    return [
+        mention["data"]["qq"] for mention in message if mention["type"] == "at"
+    ]
 
 
 def get_handlers(main) -> List[Callable]:
     """获取目前所有的指令触发函数方法"""
     commands_functions = []
 
-    for _, obj in vars(main).items():
+    for obj in vars(main).values():
         if inspect.isfunction(obj) and hasattr(obj, "__annotations__"):
             annotations = obj.__annotations__
             if annotations.get("message") is Event:
@@ -82,16 +79,12 @@ def get_user_card(event: Event) -> str:
     try:
         try:
             raw_json = json.loads(event.json())["sender"]
-            if raw_json["card"]:
-                return raw_json["card"]
-            else:
-                return raw_json["nickname"]
+            return raw_json["card"] if raw_json["card"] else raw_json["nickname"]
         except:
             from .plugins import modes
 
             cards = modes[get_mode(event)].__cards__
-            got = cards.get(event, qid=get_user_id(event))
-            if got:
+            if got := cards.get(event, qid=get_user_id(event)):
                 return got["name"]
             else:
                 return "用户"
@@ -109,8 +102,7 @@ def get_user_nickname(event) -> str:
             from .plugins import modes
 
             cards = modes[get_mode(event)].__cards__
-            got = cards.get(event, qid=get_user_id(event))
-            if got:
+            if got := cards.get(event, qid=get_user_id(event)):
                 return got["name"]
             else:
                 return "用户"
@@ -119,12 +111,8 @@ def get_user_nickname(event) -> str:
 
 
 async def get_friend_qids(bot) -> List[str]:
-    result = []
     friends = await bot.get_friend_list()
-    for friend in friends:
-        result.append(friend["user_id"])
-
-    return result
+    return [friend["user_id"] for friend in friends]
 
 
 def load_modes() -> Dict[str, list]:
@@ -142,7 +130,7 @@ def set_mode(event, mode) -> bool:
 def get_mode(event) -> str:
     """获得当前群聊的跑团模式"""
     lm = load_modes()
-    if not get_group_id(event) in lm.keys():
+    if get_group_id(event) not in lm.keys():
         lm[get_group_id(event)] = "coc"
         json.dump(lm, open(BOT_MODES_FILE, "w"))
         return "coc"

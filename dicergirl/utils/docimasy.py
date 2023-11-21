@@ -23,10 +23,7 @@ class Docimasy:
         if isinstance(judge, int):
             self.judge = judge
 
-        if judge:
-            self.judge = self.judge_dict[judge]
-        else:
-            self.judge = None
+        self.judge = self.judge_dict[judge] if judge else None
 
     def set_judge(self, judge):
         if isinstance(judge, int):
@@ -35,19 +32,12 @@ class Docimasy:
         self.judge = self.judge_dict[judge]
 
     def __bool__(self):
-        if self.judge > 0:
-            return True
-        else:
-            return False
+        return self.judge > 0
 
     def __add__(self, toadd):
         if isinstance(toadd, str):
-            toadd = toadd.lstrip("\n")
-            if toadd:
-                if self.detail:
-                    self.detail = self.detail.strip("\n") + "\n" + toadd
-                else:
-                    self.detail = toadd
+            if toadd := toadd.lstrip("\n"):
+                self.detail = self.detail.strip("\n") + "\n" + toadd if self.detail else toadd
         elif isinstance(toadd, int):
             self.judge += toadd
         elif isinstance(toadd, Docimasy):

@@ -37,10 +37,7 @@ def set_name(name) -> bool | str:
 def get_name() -> str:
     """获得骰娘的名字"""
     path = DICERGIRL_DATA_PATH / "name"
-    if not path.exists():
-        return "欧若可"
-
-    return path.open(mode="r").read()
+    return "欧若可" if not path.exists() else path.open(mode="r").read()
 
 
 def botoff(event):
@@ -80,8 +77,7 @@ def get_status(event):
 
 def load_status() -> dict:
     """导入目前所存储的机器人在各群聊中状态"""
-    status_text = BOT_STATUS_FILE.read_text(encoding="utf-8")
-    if status_text:
+    if status_text := BOT_STATUS_FILE.read_text(encoding="utf-8"):
         status = json.loads(status_text)
     else:
         status = {}
