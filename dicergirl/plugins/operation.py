@@ -37,11 +37,7 @@ async def install(name):
 async def remove(name):
     plugins = await get_plugins_mixed()
 
-    if name in plugins.keys():
-        package = plugins[name]["package"]
-    else:
-        package = name
-
+    package = plugins[name]["package"] if name in plugins.keys() else name
     rsc = await run_shell_command(f'"{sys.executable}" -m pip uninstall {package} -y')
 
     if rsc["returncode"] != 0:

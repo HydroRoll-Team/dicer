@@ -24,7 +24,7 @@ def load_loggers() -> Dict[str, list]:
 def get_loggers(event) -> List[str]:
     """获取`event`所指向的群聊中所有的日志"""
     got_loggers = json.load(open(LOGGERS_CACHE_FILE, "r"))
-    if not get_group_id(event) in got_loggers:
+    if get_group_id(event) not in got_loggers:
         return []
 
     return got_loggers[get_group_id(event)]
@@ -33,7 +33,7 @@ def get_loggers(event) -> List[str]:
 def add_logger(event: Event, logname) -> bool:
     """新增日志序列"""
     global saved_loggers
-    if not get_group_id(event) in saved_loggers.keys():
+    if get_group_id(event) not in saved_loggers.keys():
         saved_loggers[get_group_id(event)] = []
 
     try:

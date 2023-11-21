@@ -26,10 +26,7 @@ def add_super_user(message) -> bool:
     """新增超级管理员"""
     with open(SUPERUSER_FILE, "w+") as _su:
         sr = _su.read()
-        if not sr:
-            sudos = {}
-        else:
-            sudos = json.loads(sr)
+        sudos = {} if not sr else json.loads(sr)
         sudos[get_user_id(message)] = ""
         _su.write(json.dumps(sudos))
     return True
@@ -53,18 +50,10 @@ def rm_super_user(message) -> bool:
 
 def is_super_user(event) -> bool:
     """判断`event`所指向的用户是否为超级管理员"""
-    su = False
     with open(SUPERUSER_FILE, "r") as _su:
         sr = _su.read()
-        if not sr:
-            sudos = {}
-        else:
-            sudos = json.loads(sr)
-    for sudo in sudos.keys():
-        if get_user_id(event) == sudo:
-            su = True
-            break
-    return su
+        sudos = {} if not sr else json.loads(sr)
+    return any(get_user_id(event) == sudo for sudo in sudos.keys())
 
 
 def get_super_users() -> List[str]:

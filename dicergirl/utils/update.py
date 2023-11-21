@@ -13,21 +13,21 @@ def require_update(old_version: str, new_version: str):
     new_length = len(list(filter(None, new_tuple.groups())))
     old_length = len(list(filter(None, old_tuple.groups())))
 
-    if old_length == 5:
-        old_pre_release = old_tuple.group(4)[0]
-        old_pre_version = int(old_tuple.group(5))
-    elif old_length == 3:
+    if old_length == 3:
         old_pre_release = "s"
         old_pre_version = 1
+    elif old_length == 5:
+        old_pre_release = old_tuple.group(4)[0]
+        old_pre_version = int(old_tuple.group(5))
     else:
         return False
 
-    if new_length == 5:
-        new_pre_release = new_tuple.group(4)[0]
-        new_pre_version = int(new_tuple.group(5))
-    elif new_length == 3:
+    if new_length == 3:
         new_pre_release = "s"
         new_pre_version = 1
+    elif new_length == 5:
+        new_pre_release = new_tuple.group(4)[0]
+        new_pre_version = int(new_tuple.group(5))
     else:
         return False
 
@@ -36,14 +36,21 @@ def require_update(old_version: str, new_version: str):
     elif old_tuple_main > new_tuple_main:
         return False
     elif old_tuple_main == new_tuple_main:
-        if old_pre_release < new_pre_release:
+        if (
+            old_pre_release >= new_pre_release
+            and old_pre_release <= new_pre_release
+            and old_pre_release == new_pre_release
+            and old_pre_version < new_pre_version
+            or old_pre_release < new_pre_release
+        ):
             return True
-        elif old_pre_release > new_pre_release:
+        elif (
+            old_pre_release <= new_pre_release
+            and old_pre_release == new_pre_release
+            and (
+                old_pre_version > new_pre_version
+                or old_pre_version == new_pre_version
+            )
+            or old_pre_release > new_pre_release
+        ):
             return False
-        elif old_pre_release == new_pre_release:
-            if old_pre_version < new_pre_version:
-                return True
-            elif old_pre_version > new_pre_version:
-                return False
-            elif old_pre_version == new_pre_version:
-                return False

@@ -138,12 +138,12 @@ class ReplyRegistryManager(ReplyRegistry):
             response = container.get_response(event_name)
             if response:
                 is_enable = container.is_enable(event_name)
-                if response and is_enable:
-                    result = self._handle_generic_event(response, **kwargs)
-                    if result:
-                        return result
-                    else:
-                        break
+            if response and is_enable:
+                result = self._handle_generic_event(response, **kwargs)
+                if result:
+                    return result
+                else:
+                    break
         response = self._default_generic_data[NAME].get_response(event_name)
         result = self._handle_generic_event(response, **kwargs)
         if not result:
@@ -161,9 +161,7 @@ class ReplyRegistryManager(ReplyRegistry):
             str | None: 匹配字段的消息文本，如果没有匹配则返回 None。
         """
         result = self._handle_condition_event(message)
-        if len(result) == 0:
-            return None
-        return result
+        return None if len(result) == 0 else result
 
     def call_method(self, method_name: str, **kwargs):
         """

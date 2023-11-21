@@ -34,26 +34,17 @@ def modules():
 
             if module.__type__ not in ("plugin", "library"):
                 continue
-            else:
-                if module.__type__ == "plugin":
-                    module_type = "插件"
-                elif module.__type__ == "library":
-                    module_type = "库"
+            if module.__type__ == "library":
+                module_type = "库"
 
-            if hasattr(module, "__nbcommands__"):
-                commands: dict = module.__nbcommands__
-            else:
-                commands = {}
-
+            elif module.__type__ == "plugin":
+                module_type = "插件"
+            commands = module.__nbcommands__ if hasattr(module, "__nbcommands__") else {}
             if commands and not hasattr(module, "__nbhandler__"):
                 logger.error(f"{module_type} {folder.name} 配置异常, 导入失败.")
                 continue
 
-            if hasattr(module, "__nbhandler__"):
-                handlers = module.__nbhandler__
-            else:
-                handlers = {}
-
+            handlers = module.__nbhandler__ if hasattr(module, "__nbhandler__") else {}
             for command, handler in commands.items():
                 try:
                     getattr(handlers, command)(getattr(handlers, handler))
@@ -66,11 +57,11 @@ def modules():
                     logger.error("未知错误:")
                     logger.exception(error)
 
-            if module.__type__ == "plugin":
-                modes_dict[module.__name__] = module
-            elif module.__type__ == "library":
+            if module.__type__ == "library":
                 library_dict[module.__name__] = module
 
+            elif module.__type__ == "plugin":
+                modes_dict[module.__name__] = module
             logger.success(f"{module_type} {folder.name.upper()} 导入完成.")
 
     sys.path.pop(-1)

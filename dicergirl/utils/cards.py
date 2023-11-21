@@ -47,11 +47,7 @@ class Cards:
 
         with self.cache_path.open(mode="r", encoding="utf-8") as f:
             data = yaml.load(f, FullLoader)
-            if data is None:
-                self.data = {}
-            else:
-                self.data = data["cards"]
-
+            self.data = {} if data is None else data["cards"]
         return self.data
 
     def update(

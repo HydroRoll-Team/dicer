@@ -250,16 +250,11 @@ messages = Messages()
 def help_message(args: str) -> str:
     """`.help`指令后端方法"""
     similarcmd = {}
-    got = messages.get(args)
-    if got:
+    if got := messages.get(args):
         return got
 
     for key, alias in messages.keys.items():
-        relation = []
-        for alia in alias:
-            if alia:
-                relation.append(similar(alia, args))
-
+        relation = [similar(alia, args) for alia in alias if alia]
         similarcmd[key] = max(relation)
 
     related = []
@@ -276,14 +271,12 @@ def help_message(args: str) -> str:
             "HelpNotFoundRelated", MostRelated=most_related[0]
         )
 
-    i = 1
-    reply = ""
-    for relate in related:
-        reply += f"{i}. {relate}\n"
-        i += 1
-
-    reply = manager.process_generic_event("HelpNotFoundSomeRelated", MostRelated=reply)
-    return reply
+    reply = "".join(
+        f"{i}. {relate}\n" for i, relate in enumerate(related, start=1)
+    )
+    return manager.process_generic_event(
+        "HelpNotFoundSomeRelated", MostRelated=reply
+    )
 
 
 def regist(name, message, alias=[]):

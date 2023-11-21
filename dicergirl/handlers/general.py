@@ -16,10 +16,7 @@ class StatusCode:
         return __value == self.status_code
 
     def __bool__(self):
-        if self.status_code > 0:
-            return True
-        else:
-            return False
+        return self.status_code > 0
 
 
 def __set_plus_format(args: list):
@@ -57,7 +54,7 @@ def __set_default(
     for attr, alias in attrs_dict.items():
         if args[0] in alias:
             if attr in ["名字", "性别"]:
-                if attr == "性别" and not args[1] in ["男", "女"]:
+                if attr == "性别" and args[1] not in ["男", "女"]:
                     reply.append(
                         manager.process_generic_event(
                             "BadSex", event=event, CharactorName="角色", Value=args[1]
@@ -121,37 +118,15 @@ def set_handler(event: MessageEvent, args: list, at: list, mode: str = None) -> 
     attrs_dict: dict = module.__baseattrs__
     args: list = __set_plus_format(args)
 
-    attr_saved = 0
-    skill_saved = 0
-    saved_failed = 0
-
-    if len(at) == 1:
-        qid = at[0]
-    else:
-        qid = ""
-
-    if not args:
-        if cache_cards.get(event, qid=qid):
-            card_data = cache_cards.get(event, qid=qid)
-            cards.update(event, card_data, qid=qid)
-            cha = charactor.load(card_data)
-            cache_cards.delete(event)
-            return manager.process_generic_event(
-                "CardSaved", event=event, CardDetail=cha.output()
-            )
-        else:
-            return manager.process_generic_event(
-                "CacheNotFound", event=event, ModuleName=module.__name__
-            )
-    else:
-        if cards.get(event, qid=qid):
-            card_data = cards.get(event, qid=qid)
-            cha = charactor.load(card_data)
-        else:
+    qid = at[0] if len(at) == 1 else ""
+    if args:
+        if not cards.get(event, qid=qid):
             return manager.process_generic_event(
                 "CacheNotFound", event=event, ModuleName=module.__name__
             )
 
+        card_data = cards.get(event, qid=qid)
+        cha = charactor.load(card_data)
         if len(args) % 2 != 0:
             return manager.process_generic_event(
                 "AttributeCountError", event=event, Command="set"
@@ -173,6 +148,10 @@ def set_handler(event: MessageEvent, args: list, at: list, mode: str = None) -> 
                 return manager.process_generic_event(
                     "AttributeCountError", event=event, Command="set"
                 )
+
+        attr_saved = 0
+        skill_saved = 0
+        saved_failed = 0
 
         for sub_li in li:
             set_default_code = __set_default(
@@ -207,20 +186,29 @@ def set_handler(event: MessageEvent, args: list, at: list, mode: str = None) -> 
                 SkillSetNumber=skill_saved,
                 SkillSetFailed=saved_failed,
             )
-        else:
-            details = ""
-            for detail in reply:
-                details += detail + "\n"
-            details.strip("\n")
+        details = "".join(detail + "\n" for detail in reply)
+        details.strip("\n")
 
-            return manager.process_generic_event(
-                "OnSetWithFailure",
-                event=event,
-                AttrSetNumber=attr_saved,
-                SkillSetNumber=skill_saved,
-                SkillSetFailed=saved_failed,
-                FailedDetail=details,
-            )
+        return manager.process_generic_event(
+            "OnSetWithFailure",
+            event=event,
+            AttrSetNumber=attr_saved,
+            SkillSetNumber=skill_saved,
+            SkillSetFailed=saved_failed,
+            FailedDetail=details,
+        )
+    elif cache_cards.get(event, qid=qid):
+        card_data = cache_cards.get(event, qid=qid)
+        cards.update(event, card_data, qid=qid)
+        cha = charactor.load(card_data)
+        cache_cards.delete(event)
+        return manager.process_generic_event(
+            "CardSaved", event=event, CardDetail=cha.output()
+        )
+    else:
+        return manager.process_generic_event(
+            "CacheNotFound", event=event, ModuleName=module.__name__
+        )
 
 
 def show_handler(event: MessageEvent, args, at, mode=None):
@@ -231,11 +219,7 @@ def show_handler(event: MessageEvent, args, at, mode=None):
     charactor: Character = module.__charactor__()
     attrs_dict: dict = module.__baseattrs__
 
-    if len(at) == 1:
-        qid = at[0]
-    else:
-        qid = ""
-
+    qid = at[0] if len(at) == 1 else ""
     reply = []
     if not args:
         if cards.get(event, qid=qid):
@@ -260,30 +244,29 @@ def show_handler(event: MessageEvent, args, at, mode=None):
             card_data = cards.get(event, qid=qid)
             cha = charactor.load(card_data)
             reply.append(cha.skills_output())
-    else:
-        if cards.get(event, qid=qid):
-            card_data = cards.get(event, qid=qid)
-            cha = charactor.load(card_data)
-            if hasattr(cha, "out_" + args[0]):
-                try:
-                    reply.append(getattr(cha, "out_" + args[0])())
-                except:
-                    reply.append("查询时出现异常, 可能你想要查询的内容不存在?")
-            else:
-                name = args[0]
-                exp = 1
-                for key, attrs in attrs_dict.items():
-                    if args[0] in attrs:
-                        exp = getattr(cha, attrs[0])
-                        name = key
-                        break
+    elif cards.get(event, qid=qid):
+        card_data = cards.get(event, qid=qid)
+        cha = charactor.load(card_data)
+        if hasattr(cha, f"out_{args[0]}"):
+            try:
+                reply.append(getattr(cha, f"out_{args[0]}")())
+            except:
+                reply.append("查询时出现异常, 可能你想要查询的内容不存在?")
+        else:
+            name = args[0]
+            exp = 1
+            for key, attrs in attrs_dict.items():
+                if args[0] in attrs:
+                    exp = getattr(cha, attrs[0])
+                    name = key
+                    break
 
-                for skill in cha.skills.keys():
-                    if args[0] == skill:
-                        exp = cha.skills[skill]
-                        break
+            for skill in cha.skills.keys():
+                if args[0] == skill:
+                    exp = cha.skills[skill]
+                    break
 
-                reply.append(f"{name}: {exp}")
+            reply.append(f"{name}: {exp}")
 
     if not reply:
         reply.append("未查询到保存或暂存信息.")
@@ -297,16 +280,12 @@ def del_handler(event: MessageEvent, args: list, at: list, mode: str = None):
     cache_cards: Cards = module.__cache__
     cards: Cards = module.__cards__
 
-    if len(at) == 1:
-        qid = at[0]
-    else:
-        qid = ""
-
+    qid = at[0] if len(at) == 1 else ""
     r = []
     for arg in args:
         if not arg:
-            pass
-        elif arg == "cache":
+            continue
+        if arg == "cache":
             if cache_cards.get(event, qid=qid):
                 if cache_cards.delete(event, save=False):
                     r.append(
@@ -342,13 +321,12 @@ def del_handler(event: MessageEvent, args: list, at: list, mode: str = None):
                     )
             else:
                 r.append("暂无使用中的人物卡.")
-        else:
-            if cards.delete_skill(event, arg):
-                r.append(
-                    manager.process_generic_event(
-                        "SkillDeleted", event=event, SkillName=arg
-                    )
+        elif cards.delete_skill(event, arg):
+            r.append(
+                manager.process_generic_event(
+                    "SkillDeleted", event=event, SkillName=arg
                 )
+            )
 
     if not r:
         r.append("使用`.help del`获得指令使用帮助.")
@@ -373,19 +351,12 @@ def roll(event: MessageEvent, args: str, name: str = None) -> str:
                 "MultipleRollStringError", SenderCard=name
             )
 
-        if len(args) == 1:
-            args = "1d100"
-        else:
-            args = args[1]
+        args = "1d100" if len(args) == 1 else args[1]
     else:
         args = args.strip()
 
     args = args.split()
-    if len(args) > 1:
-        reason = args[1]
-    else:
-        reason = None
-
+    reason = args[1] if len(args) > 1 else None
     args = args[0]
 
     try:

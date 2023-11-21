@@ -11,16 +11,8 @@ async def get_plugins():
         response = await client.get("https://dicer.unvisitor.site/store/plugins.json")
         result = response.json()
 
-        if "official" in result.keys():
-            official = result["official"]
-        else:
-            official = {}
-
-        if "community" in result.keys():
-            community = result["community"]
-        else:
-            community = {}
-
+        official = result["official"] if "official" in result.keys() else {}
+        community = result["community"] if "community" in result.keys() else {}
         return official, community
 
 
@@ -29,16 +21,8 @@ async def get_plugins_mixed():
         response = await client.get("https://dicer.unvisitor.site/store/plugins.json")
         result = response.json()
 
-        if "official" in result.keys():
-            official = result["official"]
-        else:
-            official = {}
-
-        if "community" in result.keys():
-            community = result["community"]
-        else:
-            community = {}
-
+        official = result["official"] if "official" in result.keys() else {}
+        community = result["community"] if "community" in result.keys() else {}
         official.update(community)
         return official
 
@@ -48,12 +32,7 @@ async def get_official_plugins():
         response = await client.get("https://dicer.unvisitor.site/store/plugins.json")
         result = response.json()
 
-        if "official" in result.keys():
-            official = result["official"]
-        else:
-            official = {}
-
-        return official
+        return result["official"] if "official" in result.keys() else {}
 
 
 async def get_community_plugins():
@@ -61,12 +40,7 @@ async def get_community_plugins():
         response = await client.get("https://dicer.unvisitor.site/store/plugins.json")
         result = response.json()
 
-        if "community" in result.keys():
-            community = result["community"]
-        else:
-            community = {}
-
-        return community
+        return result["community"] if "community" in result.keys() else {}
 
 
 if __name__ == "__main__":
