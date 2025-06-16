@@ -17,17 +17,13 @@
 - [青果骰 OlivaDice](https://github.com/OlivOS-Team/OlivOS)
 - [星骰 AstralDice](https://trpgbot.com/)
 
-同样可以期待正在开发中的水系核心：
-
-- [水系核心](https://github.com/HydroRoll-Team/HydroRollCore)
-
 我们衷心感谢您在过去的时间里对本项目的支持和信任。
 
 感谢您对夜骰的关注和支持！
 
 ---
 
-*以下内容为原文*
+_以下内容为原文_
 
 ## 简介
 
